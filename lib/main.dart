@@ -1,108 +1,128 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    home: ElevatorPanel(),
+  ));
 }
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  
+class ElevatorPanel extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  _ElevatorPanelState createState() => _ElevatorPanelState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+
+
+class _ElevatorPanelState extends State<ElevatorPanel> {
+  // 按鈕的文字列表
+  final List<String> buttonLabels = [
+    '9', '10', '7', '8', '5',
+    '6', '3', '4', '1', '2',
+  ];
+
+  // 儲存按鈕是否被按下的狀態
+  Map<String, bool> buttonStatus = {};
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void initState() {
+    super.initState();
+    // 初始化按鈕狀態為false（未按下）
+    for (var label in buttonLabels) {
+      buttonStatus[label] = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "非接觸防疫電梯系統",
-          style: TextStyle(
-            fontSize: 40,
-            //fontWeight: FontWeight.bold, 粗體
-            letterSpacing: 2, //字體寬度
+        title: Text('非接觸防疫電梯系統(Alpha)'),
+      ),
+      body: Center(
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 16.0,
+              crossAxisSpacing: 16.0,
+              childAspectRatio: 1.5, // 調整按鈕的寬高比例
+            ),
+            itemCount: buttonLabels.length,
+            shrinkWrap: true, // 使得 GridView 不佔用多餘空間
+            physics: NeverScrollableScrollPhysics(), // 禁止 GridView 滾動
+            itemBuilder: (context, index) {
+              String label = buttonLabels[index];
+              return ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    // 將按鈕狀態設置為true（按下）
+                    buttonStatus[label] = !buttonStatus[label]!;
+                    print(label);
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: buttonStatus[label] !? Colors.red : null, // 設置按鈕的顏色
+                ),
+                child: Text(label),
+              );
+            },
           ),
         ),
-        centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 55, 228, 162),
       ),
-      body: 
-        Center(
-        child: 
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
 
-              Text('Deliver features faster'),
-              Text('Craft beautiful UIs'),
-              Expanded( //自動填滿
-                child: FittedBox(
-                  fit: BoxFit.contain, 
-                  child: const FlutterLogo(),
-                ),
-              ),
-              //圖片
-
-              const Text(
-                '功德',
-              ),
-
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-
-              const ElevatedButton  (
-                onPressed: null,
-                child: Text(
-                  'Disabled Button',
-                  style: TextStyle(fontSize: 20)
-                ),
-              ),
-              const SizedBox(height: 100),//空格
-              Row( //同個body不能同時選用column和row必須把row放在column裡面
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(Icons.circle, color: Colors.blue),
-                Icon(Icons.circle, color: Colors.blue),
-                Icon(Icons.circle, color: Colors.blue),
-              ],
-            ),
-            ],
-          ),
+      bottomNavigationBar: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _Page('手勢字典',page1),
+          _Page('電梯面板',page1),
+          _Page('定義手勢',page1),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-        elevation: 20, //陰影
-      ), 
     );
-    
+  }
+
+  Widget _Page(String text, void Function() wherepage) {
+    return TextButton(
+      onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => BPage()));
+        },
+
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 20),
+      ),
+    );
+  }
+  void page1() {
+    print('轉跳');
+  }
+  
+  
+}
+
+class BPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('頁面'),
+      ),
+      body: _BPage(),
+    );
+  }
+}
+
+class _BPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: TextButton(
+        child: Text('返回首頁'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }
